@@ -1,0 +1,10 @@
+teams:
+  CarbonTeam:
+    owner: 9bba83f8-dbfe-4d56-bd36-5dbcee3a461c
+    members: []
+    greeting: ''
+    notice: ''
+    prefix: '&bCT'
+    postfix: ''
+    banner: {}
+    allies: []

@@ -1,0 +1,14 @@
+name: CarbonTeams
+author: OffLuffy
+main: net.teamcarbon.carbonteams.CarbonTeams
+version: 1.0
+depend: [Vault]
+soft-depend: [Essentials]
+commands:
+  teams:
+    description: The main command for the Teams plugin.
+    aliases: [team,tms,t]
+  teamchat:
+    description: TeamChat command
+    usage: /tc or /tc [on|off] toggles persistent chat mode, or /tc [message] to send a single message
+    aliases: [tc,tchat,teamschat,p,pc,pchat,partychat]
