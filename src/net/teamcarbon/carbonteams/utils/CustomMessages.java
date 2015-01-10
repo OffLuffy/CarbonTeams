@@ -43,12 +43,12 @@ public class CustomMessages {
 		 * Attempts to load all CustomMessage objects from disk, filling in missing messages with default values
 		 */
 		public static void loadMessages() {
-			FileConfiguration msgs = CarbonTeams.inst.getConfig(ConfType.MESSAGES);
+			FileConfiguration msgs = CarbonTeams.getConfig(ConfType.MESSAGES);
 			for (CustomMessage cm : CustomMessage.values()) {
 				cm.msg = msgs.getString(cm.path, cm.defMsg);
 				msgs.set(cm.path, cm.msg);
 			}
-			CarbonTeams.inst.saveConfig(ConfType.MESSAGES);
+			CarbonTeams.saveConfig(ConfType.MESSAGES);
 			init = true;
 		}
 

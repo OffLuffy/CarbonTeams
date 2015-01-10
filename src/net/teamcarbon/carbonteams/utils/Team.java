@@ -18,7 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 @SuppressWarnings("UnusedDeclaration")
 public class Team {
@@ -183,8 +183,8 @@ public class Team {
 	 */
 	public void setHome(Location home) {
 		this.home = home;
-		CarbonTeams.inst.getConfig(ConfType.TEAMS).set(getName() + ".home", LocUtils.toStr(home, false));
-		CarbonTeams.inst.saveConfig(ConfType.TEAMS);
+		CarbonTeams.getConfig(ConfType.TEAMS).set(getName() + ".home", LocUtils.toStr(home, false));
+		CarbonTeams.saveConfig(ConfType.TEAMS);
 	}
 
 	public void setGreeting(String greeting) {
@@ -196,12 +196,12 @@ public class Team {
 	}
 
 	public boolean setBanner(ItemStack banner) { // TODO Finish
-		ConfigurationSection sect = CarbonTeams.inst.getConfig(ConfType.TEAMS).getConfigurationSection("banner-settings");
+		ConfigurationSection sect = CarbonTeams.getConfig(ConfType.TEAMS).getConfigurationSection("banner-settings");
 		banner = new ItemStack(banner);
 		if (CarbonTeams.bannersEnabled) {
 			if (banner.getType().equals(Material.getMaterial("BANNER"))) {
 				banner.setAmount(1);
-				BannerMeta bm = (BannerMeta)banner.getItemMeta();
+				ItemMeta bm = banner.getItemMeta();
 				String bannerName = trans(vars(sect.getString("banner-name"), null));
 				List<String> bannerLore = new ArrayList<String>();
 				for (String s : sect.getStringList("banner-lore"))
@@ -220,7 +220,7 @@ public class Team {
 	 */
 	public void loadTeamDataFromFile() {
 		Log.debug("Loading data for Team: " + getName());
-		ConfigurationSection sect = CarbonTeams.inst.getConfig(ConfType.TEAMS).getConfigurationSection(teamsPath);
+		ConfigurationSection sect = CarbonTeams.getConfig(ConfType.TEAMS).getConfigurationSection(teamsPath);
 		setHome(LocUtils.fromStr(sect.getString(teamsPath + ".home")));
 		setPrefix(sect.getString(teamsPath + ".prefix"));
 		setPostfix(sect.getString(teamsPath + ".postfix"));
@@ -232,7 +232,7 @@ public class Team {
 		if (members == null) members = new ArrayList<OfflinePlayer>();
 		if (!members.isEmpty()) members.clear();
 		boolean needsSave = false;
-		FileConfiguration teams = CarbonTeams.inst.getConfig(ConfType.TEAMS);
+		FileConfiguration teams = CarbonTeams.getConfig(ConfType.TEAMS);
 		// Iterates over a copy of the list in case it needs to remove a UUID during iteration
 		// This will log a warning noting the invalid UUID then remove it to prevent spamming the warning
 		for (String s : new ArrayList<String>(teams.getStringList("teams." + getName() + ".members"))) {
@@ -246,16 +246,16 @@ public class Team {
 			}
 		}
 		// If values have been removed from the member list, resave the file
-		if (needsSave) { CarbonTeams.inst.saveConfig(ConfType.TEAMS); }
+		if (needsSave) { CarbonTeams.saveConfig(ConfType.TEAMS); }
 	}
 	
 	public void addMember(Player p) {
 		if (p == null) return;
 		String id = p.getUniqueId().toString();
-		FileConfiguration teams = CarbonTeams.inst.getConfig(ConfType.TEAMS);
+		FileConfiguration teams = CarbonTeams.getConfig(ConfType.TEAMS);
 		if (MiscUtils.addToStringList(teams, teamsPath + ".members", id))
 			p.sendMessage(vars(CustomMessage.ADDED_TO_TEAM.pre(), null));
-		CarbonTeams.inst.saveConfig(ConfType.TEAMS);
+		CarbonTeams.saveConfig(ConfType.TEAMS);
 	}
 
 	/**
@@ -265,10 +265,10 @@ public class Team {
 	public void removeMember(Player p) {
 		if (p == null) return;
 		String id = p.getUniqueId().toString();
-		FileConfiguration teams = CarbonTeams.inst.getConfig(ConfType.TEAMS);
+		FileConfiguration teams = CarbonTeams.getConfig(ConfType.TEAMS);
 		if (MiscUtils.removeFromStringList(teams, teamsPath + ".members", id))
 			p.sendMessage(vars(CustomMessage.REMOVED_FROM_TEAM.pre(), null));
-		CarbonTeams.inst.saveConfig(ConfType.TEAMS);
+		CarbonTeams.saveConfig(ConfType.TEAMS);
 	}
 
 	/**
@@ -278,10 +278,10 @@ public class Team {
 	public void removeMember(OfflinePlayer p) {
 		if (p == null) return;
 		String id = p.getUniqueId().toString();
-		FileConfiguration teams = CarbonTeams.inst.getConfig(ConfType.TEAMS);
+		FileConfiguration teams = CarbonTeams.getConfig(ConfType.TEAMS);
 		if (MiscUtils.removeFromStringList(teams, "teams." + getName() + ".members", id) && p.isOnline())
 			((Player)p).sendMessage(CustomMessage.REMOVED_FROM_TEAM.pre());
-		CarbonTeams.inst.saveConfig(ConfType.TEAMS);
+		CarbonTeams.saveConfig(ConfType.TEAMS);
 	}
 
 	/**
@@ -385,7 +385,7 @@ public class Team {
 	 * Load Teams data.
 	 */
 	public static void init() {
-		ConfigurationSection teams = CarbonTeams.inst.getConfig(ConfType.TEAMS).getConfigurationSection("teams");
+		ConfigurationSection teams = CarbonTeams.getConfig(ConfType.TEAMS).getConfigurationSection("teams");
 		for (String key : teams.getKeys(false)) { new Team(key); } // Data loading is done in constructor
 		// Now that we've instantiated all Teams, we can determine which Teams are allies of what
 		loadAllies();

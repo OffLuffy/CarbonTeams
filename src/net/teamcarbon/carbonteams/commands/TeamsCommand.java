@@ -57,6 +57,7 @@ public class TeamsCommand implements CommandExecutor {
 			if (MiscUtils.eq(args[0], "chat")) {
 				if (Team.hasTeam(player)) {
 					ChatType type = CarbonTeams.getChatMode(player);
+					// TODO Fix these errors
 					switch (type) {
 						case ENEMY:
 							player.sendMessage(ChatColor.YELLOW + "Now talking in ALL chat.");
