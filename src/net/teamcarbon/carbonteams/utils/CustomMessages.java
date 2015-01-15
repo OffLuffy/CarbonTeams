@@ -25,7 +25,15 @@ public class CustomMessages {
 		// Team messages
 		REMOVED_FROM_TEAM("removed-from-team", "&bYou've been removed from the team: &6{TEAMNAME}"),
 		ADDED_TO_TEAM("added-to-team", "&bYou've been assigned to the team: &6{TEAMNAME}"),
-		NO_CHAT_TEAM("no-chat-team", "&cYou don't have a team to chat with!");
+		COLLECTOR_EXP_SHARE("collector-exp-share", "&bCollected {COLLECTED} exp, shared {SHARED} exp with {SHARECOUNT} others"),
+		SHARED_EXP_SHARE("shared-exp-share", "&Gained {SHARED} exp, collected by {COLLECTOR}"),
+		NO_CHAT_TEAM("no-chat-team", "&cYou don't have a team to chat with!"),
+		ALL_CHAT_MODE("all-chat-mode", "&bYou're now talking in public chat"),
+		ALL_CHAT_ALREADY("all-chat-already", "&bYou're already talking in public chat"),
+		TEAM_CHAT_MODE("team-chat-mode", "&bYou're now talking in team chat"),
+		TEAM_CHAT_ALREADY("team-chat-mode", "&bYou're already talking in team chat"),
+		ALLY_CHAT_MODE("ally-chat-mode", "&bYou're now talking in ally chat"),
+		ALLY_CHAT_ALREADY("ally-chat-mode", "&bYou're already talking in ally chat");
 
 		private String msg, path, defMsg;
 		CustomMessage(String path, String defMsg) { this.path = path; this.defMsg = defMsg; }

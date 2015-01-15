@@ -3,6 +3,7 @@ package net.teamcarbon.carbonteams;
 import net.milkbowl.vault.chat.Chat;
 import net.teamcarbon.carbonteams.commands.TeamsCommand;
 import net.teamcarbon.carbonteams.listeners.ChatListener;
+import net.teamcarbon.carbonteams.listeners.MiscListeners;
 import net.teamcarbon.carbonteams.listeners.TeamListeners;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@SuppressWarnings("UnusedDeclaration")
 public class CarbonTeams extends JavaPlugin {
 
 	/**
@@ -101,6 +103,7 @@ public class CarbonTeams extends JavaPlugin {
 	// Some variables for holding other data used elsewhere
 	private static HashMap<Player, ChatType> chatMode = new HashMap<Player, ChatType>();
 	private static List<Player> spies = new ArrayList<Player>();
+	private static List<Player> listeningAllies = new ArrayList<Player>();
 	
 	public void onEnable() {
 		inst = this;
@@ -127,6 +130,7 @@ public class CarbonTeams extends JavaPlugin {
 		// Registers the chat listener event
 		pm.registerEvents(new ChatListener(), this);
 		pm.registerEvents(new TeamListeners(), this);
+		pm.registerEvents(new MiscListeners(), this);
 
 		// Registers commands
 		getServer().getPluginCommand("teams").setExecutor(new TeamsCommand());
@@ -211,6 +215,44 @@ public class CarbonTeams extends JavaPlugin {
 	 * @return Returns true if the Player is spying, false otherwise
 	 */
 	public static boolean isSpying(Player p) { return spies.contains(p); }
+
+	/**
+	 * Sets whether the Player is listening to their ally chat or not
+	 * @param p The Player to set
+	 * @param listening Whether or not the Player is listening
+	 */
+	public static void setListeningToAllies(Player p, boolean listening) {
+		if (!listening && listeningAllies.contains(p)) listeningAllies.remove(p);
+		else if (listening && !listeningAllies.contains(p)) listeningAllies.add(p);
+	}
+
+	/**
+	 * Toggles whether the Player is listening to their ally chat or not
+	 * @param p The Player to toggle
+	 */
+	public static void toggleListeningToAllies(Player p) { setListeningToAllies(p, !isListeningToAllies(p));}
+
+	/**
+	 * Indicates if the Player is listening to their ally chat
+	 * @param p The Player to check
+	 * @return Returns true if the Player is listening to their ally chat, false otherwise
+	 */
+	public static boolean isListeningToAllies(Player p) { return listeningAllies.contains(p); }
+
+	/**
+	 * @return Returns Vault's Chat object
+	 */
+	public static Chat chat() { return chat; }
+
+	/**
+	 * @return Returns Vault's Permission object
+	 */
+	public static Permission perm() { return perms; }
+
+	/**
+	 * @return Returns Vault's Economy object
+	 */
+	public static Economy econ() { return econ; }
 
 	// Hook into Vault's chat service, store as global static variable
 	private boolean setupChat() {

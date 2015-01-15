@@ -27,10 +27,11 @@ public class Team {
 	private static List<Team> teams;
 
 	private String name, prefix, postfix, teamsPath, greet, notice;
-	private OfflinePlayer owner;
+	private OfflinePlayer leader;
 	private List<OfflinePlayer> members;
 	private List<Team> allies;
 	private Location home;
+	private boolean expShare, memberInviteEnabled;
 
 	/**
 	 * Constructor for a new Team or when loading Teams. Default data will be applied if it doesn't exist in teams.yml
@@ -86,6 +87,19 @@ public class Team {
 	public String getNotice() { return notice; }
 
 	/**
+	 * Fetches this Team's leader
+	 * @return Returns an OfflinePlayer representing this Team's leader
+	 */
+	public OfflinePlayer getLeader() { return leader; }
+
+	/**
+	 * Indicates whether the specified player is the Team's leader
+	 * @param pl The OfflinePlayer to check
+	 * @return Returns true if the OfflinePlayer specified is this Team's leader, false otherwise
+	 */
+	public boolean isLeader(OfflinePlayer pl) { return leader.equals(pl); }
+
+	/**
 	 * Checks if the specified OfflinePlayer matches an OfflinePlayer in the members list
 	 * @param p The OfflinePlayer to check
 	 * @return Returns true if the player is a member, false otherwise
@@ -134,6 +148,43 @@ public class Team {
 		for (Team t : allies) allyMembers.addAll(t.getMembers());
 		return allyMembers;
 	}
+
+	/**
+	 * Indicates whether this team has experience sharing enabled
+	 * @return Returns true if the team has exp share enabled or if global exp share is forced for all teams, false otherwise
+	 */
+	public boolean isExpShareEnabled() {
+		ConfigurationSection c = CarbonTeams.inst.getConfig().getConfigurationSection("experience-sharing");
+		return c.getBoolean("enabled", true) && (expShare || !c.getBoolean("per-team-toggle", true));
+	}
+
+	/**
+	 * Toggles whether this team has experience sharing enabled
+	 */
+	public void toggleExpShare() { expShare = !expShare; }
+
+	/**
+	 * Sets the exp share state for this Team
+	 * @param enabled Whether or not to enable exp sharing for this Team
+	 */
+	public void setExpShareEnabled(boolean enabled) { expShare = enabled; }
+
+	/**
+	 * Indicates if this Team's members other than it's leader can invite other players to the team
+	 * @return Returns true if team members can invite player to the team
+	 */
+	public boolean canMembersInvite() { return memberInviteEnabled; }
+
+	/**
+	 * Toggles whether this team allows members to invite others to the team
+	 */
+	public void toggleMemberInviteEnabled() { memberInviteEnabled = !memberInviteEnabled; }
+
+	/**
+	 * Sets the member invite state of this Team
+	 * @param enabled Whether or not to enabled member inviting for this Team
+	 */
+	public void setMemberInviteEnabled(boolean enabled) { memberInviteEnabled = enabled; }
 
 	// Mutator methods are used to modify a Team's data
 	// and makes sure the data provided is valid
@@ -307,17 +358,42 @@ public class Team {
 	 * @param message The message to send
 	 */
 	public void sendTeamMessage(Player p, String message) {
+		String msgPatPath = "message-settings.team-message-pattern";
+		String spyPatPath = "message-settings.spy-team-pattner";
+		String defaultPat = "&8[&b{PREFIX}&8] &7{SENDER}:&b {MESSAGE}";
+		String defSpyPat = "&8[&eTSpy&8][&b{PREFIX}&8] &7{SENDER}:&7 {MESSAGE}";
+		boolean dispName = CarbonTeams.inst.getConfig().getBoolean("message-settings.use-player-displayname", false);
 		for (Player pl : Bukkit.getOnlinePlayers()) {
-			if (isMember(pl)) {
-				// TODO Sent message to team members and spies
+			if (isMember(pl) || CarbonTeams.isSpying(pl)) {
+				// Prepare this list to store the message/sender to pass to variable parsing
+				HashMap<String, String> additional = new HashMap<String, String>();
+				// permColorParse() only parses color codes if the specified user has permission to do so
+				additional.put("{MESSAGE}", MiscUtils.permColorParse(message, pl, "carbonteams.chat.teams"));
+				additional.put("{SENDER}", dispName?pl.getDisplayName():pl.getName());
+				if (isMember(pl)) // Send this to team members (even if spying, they're in this team, send normally)
+					pl.sendMessage(vars(trans(CarbonTeams.inst.getConfig().getString(msgPatPath, defaultPat)), additional));
+				else // If they're not in this team, they must be spying, send spy formatted message
+					pl.sendMessage(vars(trans(CarbonTeams.inst.getConfig().getString(spyPatPath, defSpyPat)), additional));
 			}
 		}
 	}
 
 	public void sendAllyMessage(Player p, String message) {
+		String msgPatPath = "message-settings.ally-message-pattern";
+		String spyPatPath = "message-settings.spy-ally-pattner";
+		String defaultPat = "&7♥&8[&b{PREFIX}&8] &7{SENDER}:&3 {MESSAGE}";
+		String defSpyPat = "&8[&eTSpy&8]&7♥&8[&b{PREFIX}&8] &7{SENDER}:&7 {MESSAGE}";
+		boolean dispName = CarbonTeams.inst.getConfig().getBoolean("message-settings.use-player-displayname", false);
 		for (Player pl : Bukkit.getOnlinePlayers()) {
-			if (isMember(pl)) {// TODO Check if ally team member
-				// TODO Sent message to team members, allies, and spies
+			if (((isMember(pl) || isAlly(pl)) && CarbonTeams.isListeningToAllies(pl)) || CarbonTeams.isSpying(pl)) {
+				HashMap<String, String> additional = new HashMap<String, String>();
+				additional.put("{MESSAGE}", MiscUtils.permColorParse(message, pl, "carbonteams.chat.allies"));
+				additional.put("{SENDER}", dispName?pl.getDisplayName():pl.getName());
+				// Send to members or allies whom are listening
+				if ((isMember(pl) || isAlly(pl)) && CarbonTeams.isListeningToAllies(pl))
+					pl.sendMessage(vars(trans(CarbonTeams.inst.getConfig().getString( msgPatPath, defaultPat)), additional));
+				else // Otherwise only send to spies (already guaranteed if it gets here)
+					pl.sendMessage(vars(trans(CarbonTeams.inst.getConfig().getString(spyPatPath, defSpyPat)), additional));
 			}
 		}
 	}
@@ -336,7 +412,7 @@ public class Team {
 		replace.put("{TEAMNAME}", getName());
 		replace.put("{PREFIX}", getPrefix());
 		replace.put("{POSTFIX}", getPostfix());
-		replace.put("{LEADER}", owner.getName());
+		replace.put("{LEADER}", leader.getName());
 		replace.put("{GREETING}", getGreeting());
 		replace.put("{NOTICE}", getNotice());
 		if (additional != null && !additional.isEmpty()) s = MiscUtils.massReplace(s, additional);

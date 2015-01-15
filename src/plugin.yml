@@ -12,3 +12,118 @@ commands:
     description: TeamChat command
     usage: /tc or /tc [on|off] toggles persistent chat mode, or /tc [message] to send a single message
     aliases: [tc,tchat,teamschat,p,pc,pchat,partychat]
+permissions:
+  carbonteams.*:
+    description: All CarbonTeams permissions
+    default: op
+    children:
+      carbonteams.chat.*: true
+  carbonteams.chat.*:
+    description: Access to all CarbonTeams chat channels
+    default: op
+    children:
+      carbonteams.chat.teams: true
+      carbonteams.chat.teams.color.*: true
+      carbonteams.chat.teams.format.*: true
+      carbonteams.chat.allies: true
+      carbonteams.chat.allies.color.*: true
+      carbonteams.chat.allies.format.*: true
+  carbonteams.chat.chat.teams.color.*:
+    description: Access to use any color code in team chat
+    default: op
+    children:
+      carbonteams.chat.teams.color.aqua: true
+      carbonteams.chat.teams.color.black: true
+      carbonteams.chat.teams.color.blue: true
+      carbonteams.chat.teams.color.dark_aqua: true
+      carbonteams.chat.teams.color.dark_blue: true
+      carbonteams.chat.teams.color.dark_gray: true
+      carbonteams.chat.teams.color.dark_green: true
+      carbonteams.chat.teams.color.dark_purple: true
+      carbonteams.chat.teams.color.dark_red: true
+      carbonteams.chat.teams.color.gold: true
+      carbonteams.chat.teams.color.gray: true
+      carbonteams.chat.teams.color.green: true
+      carbonteams.chat.teams.color.light_purple: true
+      carbonteams.chat.teams.color.red: true
+      carbonteams.chat.teams.color.white: true
+      carbonteams.chat.teams.color.yellow: true
+  carbonteams.chat.teams.format.*:
+    description: Access to use any format code in team chat
+    default: op
+    children:
+      carbonteams.chat.teams.format.bold: true
+      carbonteams.chat.teams.format.italic: true
+      carbonteams.chat.teams.format.magic: true
+      carbonteams.chat.teams.format.reset: true
+      carbonteams.chat.teams.format.strikethrough: true
+      carbonteams.chat.teams.format.underline: true
+  carbonteams.chat.chat.allies.color.*:
+    description: Access to use any color code in ally chat
+    default: op
+    children:
+      carbonteams.chat.allies.color.aqua: true
+      carbonteams.chat.allies.color.black: true
+      carbonteams.chat.allies.color.blue: true
+      carbonteams.chat.allies.color.dark_aqua: true
+      carbonteams.chat.allies.color.dark_blue: true
+      carbonteams.chat.allies.color.dark_gray: true
+      carbonteams.chat.allies.color.dark_green: true
+      carbonteams.chat.allies.color.dark_purple: true
+      carbonteams.chat.allies.color.dark_red: true
+      carbonteams.chat.allies.color.gold: true
+      carbonteams.chat.allies.color.gray: true
+      carbonteams.chat.allies.color.green: true
+      carbonteams.chat.allies.color.light_purple: true
+      carbonteams.chat.allies.color.red: true
+      carbonteams.chat.allies.color.white: true
+      carbonteams.chat.allies.color.yellow: true
+  carbonteams.chat.allies.format.*:
+    description: Access to use any format code in ally chat
+    default: op
+    children:
+      carbonteams.chat.allies.format.bold: true
+      carbonteams.chat.allies.format.italic: true
+      carbonteams.chat.allies.format.magic: true
+      carbonteams.chat.allies.format.reset: true
+      carbonteams.chat.allies.format.strikethrough: true
+      carbonteams.chat.allies.format.underline: true
+  carbonteams.teams.set.*:
+    description: Access to set any properties for any team
+    default: op
+    children:
+      carbonteams.set.self.*: true
+      carbonteams.set.others.*: true
+  carbonteams.set.self.*:
+    description: Access to set any properties of your own team
+    default: op
+    children:
+      carbonteams.set.self.locked: true
+      carbonteams.set.self.home: true
+      carbonteams.set.self.banner: true
+      carbonteams.set.self.prefix: true
+      carbonteams.set.self.postfix: true
+      carbonteams.set.self.greeting: true
+      carbonteams.set.self.notice: true
+      carbonteams.set.self.title: true
+  carbonteams.set.others.*:
+    description: Access to set any properties of your own team
+    default: op
+    children:
+      carbonteams.set.others.locked: true
+      carbonteams.set.others.home: true
+      carbonteams.set.others.banner: true
+      carbonteams.set.others.prefix: true
+      carbonteams.set.others.postfix: true
+      carbonteams.set.others.greeting: true
+      carbonteams.set.others.notice: true
+      carbonteams.set.others.title: true
+  carbonteams.set.self.locked:
+    description: Ability to lock or unlock a team you own
+    default: op
+  carbonteams.set.others.locked:
+    description: Ability to lock or unlock yours or any other teams
+    default: op
+  carbonteams.create:
+    description: Access to join a team
+    default: op

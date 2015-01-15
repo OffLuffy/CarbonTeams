@@ -1,13 +1,10 @@
 package net.teamcarbon.carbonteams.commands;
 
+import net.teamcarbon.carbonlib.Messages.Clr;
 import net.teamcarbon.carbonlib.MiscUtils;
 import net.teamcarbon.carbonteams.CarbonTeams;
-import net.teamcarbon.carbonteams.CarbonTeams.ChatType;
-import net.teamcarbon.carbonteams.listeners.ChatListener;
-import net.teamcarbon.carbonteams.utils.Team;
 import net.teamcarbon.carbonteams.utils.CustomMessages.CustomMessage;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import net.teamcarbon.carbonteams.utils.Team;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,32 +15,52 @@ import org.bukkit.plugin.PluginDescriptionFile;
 public class TeamsCommand implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-		if (!(sender instanceof Player)) {
-			sender.sendMessage(CustomMessage.NOT_ONLINE.noPre());
-			return true;
-		}
-		Player player = (Player)sender;
-		if (args.length == 0) {
+		String perm = "carbonteams."; // So I don't have to retype this everytime
+		boolean isPlayer = sender instanceof Player;
+		if (args.length == 0 || MiscUtils.eq(args[0], "help", "?")) {
 			PluginDescriptionFile pdf = CarbonTeams.inst.getDescription();
-			String aliases = "/" + CarbonTeams.inst.getServer().getPluginCommand("teams").getLabel();
-			for (String s : CarbonTeams.inst.getServer().getCommandAliases().get("teams")) { aliases += ", /" + s; }
-
-			CustomMessage.printHeader(player, pdf.getName() + " v" + pdf.getVersion());
-			player.sendMessage(ChatColor.GRAY + "Aliases: " + aliases);
-			player.sendMessage(ChatColor.GREEN + "To change chat modes, do #Team, if you want to revert back to ALL chat, do ##");
-			player.sendMessage(ChatColor.GREEN + "/" + label + " " + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Shows this help menu.");
-			player.sendMessage(ChatColor.GREEN + "/" + label + " home" + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + "Teleports you to your team's home");
-			if (player.hasPermission("teams.admin")) {
-				player.sendMessage(ChatColor.GREEN + "/" + label + " create <name>" + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Creates a Team");
-				player.sendMessage(ChatColor.GREEN + "/" + label + " create <name> [user] [user] ..." + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Creates a team with the specified players in it");
-				player.sendMessage(ChatColor.GREEN + "/" + label + " delete <name>" + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Deletes a team");
-				player.sendMessage(ChatColor.GREEN + "/" + label + " add [team] [user] [user] ..." + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Adds players to the specified team");
-				player.sendMessage(ChatColor.GREEN + "/" + label + " remove [team] [user] [user] ..." + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Removes the players from the team");
-				player.sendMessage(ChatColor.GREEN + "/" + label + " sethome [team]" + ChatColor.DARK_GRAY + " || " + ChatColor.GRAY + " Sets the teams home");
+			if (!isPlayer) {
+				CustomMessage.printHeader(sender, pdf.getName() + " Console Commands");
+				sender.sendMessage(Clr.BLUE + "<> = Required, [] = Optional");
+				// No need for perm checks when executing as console
+				sender.sendMessage(Clr.LIME + "/" + label + Clr.GRAY + " Teams help menu");
+				sender.sendMessage(Clr.LIME + "/" + label + " create <team>" + Clr.GRAY + " Creates a new empty team");
+				sender.sendMessage(Clr.LIME + "/" + label + " create <team> [users]" + Clr.GRAY + " Creates a new team add users in it");
+				sender.sendMessage(Clr.LIME + "/" + label + " delete <team>" + Clr.GRAY + " Deletes a team");
+				sender.sendMessage(Clr.LIME + "/" + label + " kick <team> <users>" + Clr.GRAY + " Kick users from a team");
+				sender.sendMessage(Clr.LIME + "/" + label + " add <team> <users>" + Clr.GRAY + " Adds users to a team");
+			} else {
+				CustomMessage.printHeader(sender, "CarbonTeams Help");
+				// TODO Players can join/invite/create/remove/set (with permission)
+				sender.sendMessage(Clr.LIME + "/" + label + Clr.GRAY + " Teams help menu");
+				// This method sends the message if the player has a specified permission
+				ps(sender, perm+"create",			Clr.LIME+"/"+label+" create <team>" + Clr.GRAY + " Creates your team");
+				ps(sender, perm+"delete.self",		Clr.LIME+"/"+label+" delete" + Clr.GRAY + " Deletes your team");
+				ps(sender, perm+"delete.others",	Clr.LIME+"/"+label+" delete <team>" + Clr.GRAY + " Deletes another team");
+				ps(sender, perm+"kick.others",		Clr.LIME+"/"+label+" kick <team> [users]" + Clr.GRAY + " Kicks users out of another team");
+				ps(sender, perm+"accept",			Clr.LIME+"/"+label+" accept [team]" + Clr.GRAY + " Accepts an invite to a team");
+				ps(sender, perm+"join",				Clr.LIME+"/"+label+" join <team>" + Clr.GRAY + " Join a team if unlocked or invited");
+				if (Team.hasTeam((Player)sender)) {
+					Team t = Team.getTeam((Player)sender);
+					if (t.isLeader((Player)sender) || t.canMembersInvite())
+						ps(sender, perm + "invite", Clr.LIME + "/" + label + " invite [users]" + Clr.GRAY + " Invites users to your team team");
+					if (t.isLeader((Player) sender)) {
+						ps(sender, perm + "kick.self",			Clr.LIME+"/"+label+" kick [users]" + Clr.GRAY + " Kicks users out of your team");
+						ps(sender, perm + "set.self.home",		Clr.LIME+"/"+label+" set home" + Clr.GRAY + " Set your team's home where you're standing");
+						ps(sender, perm + "set.self.banner",	Clr.LIME+"/"+label+" set banner" + Clr.GRAY + " Set your team's banner (hold a banner)");
+						ps(sender, perm + "set.self.prefix",	Clr.LIME+"/"+label+" set prefix <prefix>" + Clr.GRAY + " Set your team's prefix");
+						ps(sender, perm + "set.self.postfix",	Clr.LIME+"/"+label+" set postfix <postfix>" + Clr.GRAY + " Set your team's postfix");
+						ps(sender, perm + "set.self.greeting",	Clr.LIME+"/"+label+" set greeting <greeting>" + Clr.GRAY + " Set your team's greeting");
+						ps(sender, perm + "set.self.notice",	Clr.LIME+"/"+label+" set notice <notice>" + Clr.GRAY + " Set your team's notice");
+						ps(sender, perm + "set.self.title",		Clr.LIME+"/"+label+" set title <title>" + Clr.GRAY + " Set your team's title");
+						ps(sender, perm + "set.self.locked",	Clr.LIME+"/"+label+" set locked [on|off]" + Clr.GRAY + " Toggle if players can join without invites");
+						ps(sender, perm + "set.self.invites",	Clr.LIME+"/"+label+" set invites [on|off]" + Clr.GRAY + " Toggle if members can invite or not");
+					}
+				}
 			}
 			return true;
 		}
-		if (args.length == 1) {
+		/*if (args.length == 1) {
 			if (player.hasPermission("teams.admin")) {
 				if (MiscUtils.eq(args[0], "create")) {
 					player.sendMessage(ChatColor.RED + "/teams create [TeamName]");
@@ -57,7 +74,6 @@ public class TeamsCommand implements CommandExecutor {
 			if (MiscUtils.eq(args[0], "chat")) {
 				if (Team.hasTeam(player)) {
 					ChatType type = CarbonTeams.getChatMode(player);
-					// TODO Fix these errors
 					switch (type) {
 						case ENEMY:
 							player.sendMessage(ChatColor.YELLOW + "Now talking in ALL chat.");
@@ -164,7 +180,10 @@ public class TeamsCommand implements CommandExecutor {
 					return true;
 				}
 			}
-		}
+		}*/
 		return true;
 	}
+
+	// Shorthand method, just to shorten line lengths since I use it a lot above.
+	private void ps(CommandSender s, String p, String m) { MiscUtils.permSend(s, p, m); }
 }
