@@ -45,145 +45,72 @@ public class TeamsCommand implements CommandExecutor {
 					if (t.isLeader((Player)sender) || t.canMembersInvite())
 						ps(sender, perm + "invite", Clr.LIME + "/" + label + " invite [users]" + Clr.GRAY + " Invites users to your team team");
 					if (t.isLeader((Player) sender)) {
-						ps(sender, perm + "kick.self",			Clr.LIME+"/"+label+" kick [users]" + Clr.GRAY + " Kicks users out of your team");
-						ps(sender, perm + "set.self.home",		Clr.LIME+"/"+label+" set home" + Clr.GRAY + " Set your team's home where you're standing");
-						ps(sender, perm + "set.self.banner",	Clr.LIME+"/"+label+" set banner" + Clr.GRAY + " Set your team's banner (hold a banner)");
-						ps(sender, perm + "set.self.prefix",	Clr.LIME+"/"+label+" set prefix <prefix>" + Clr.GRAY + " Set your team's prefix");
-						ps(sender, perm + "set.self.postfix",	Clr.LIME+"/"+label+" set postfix <postfix>" + Clr.GRAY + " Set your team's postfix");
-						ps(sender, perm + "set.self.greeting",	Clr.LIME+"/"+label+" set greeting <greeting>" + Clr.GRAY + " Set your team's greeting");
-						ps(sender, perm + "set.self.notice",	Clr.LIME+"/"+label+" set notice <notice>" + Clr.GRAY + " Set your team's notice");
-						ps(sender, perm + "set.self.title",		Clr.LIME+"/"+label+" set title <title>" + Clr.GRAY + " Set your team's title");
-						ps(sender, perm + "set.self.locked",	Clr.LIME+"/"+label+" set locked [on|off]" + Clr.GRAY + " Toggle if players can join without invites");
-						ps(sender, perm + "set.self.invites",	Clr.LIME+"/"+label+" set invites [on|off]" + Clr.GRAY + " Toggle if members can invite or not");
+						ps(sender, perm+"kick.self", label,			"kick [users]" + Clr.GRAY + " Kicks users out of your team");
+						ps(sender, perm+"set.self.home", label,		"set home" + Clr.GRAY + " Set your team's home where you're standing");
+						ps(sender, perm+"set.self.banner", label,	"set banner" + Clr.GRAY + " Set your team's banner (hold a banner)");
+						ps(sender, perm+"set.self.prefix", label,	"set prefix <prefix>" + Clr.GRAY + " Set your team's prefix");
+						ps(sender, perm+"set.self.postfix", label,	"set postfix <postfix>" + Clr.GRAY + " Set your team's postfix");
+						ps(sender, perm+"set.self.greeting", label,	"set greeting <greeting>" + Clr.GRAY + " Set your team's greeting");
+						ps(sender, perm+"set.self.notice", label,	"set notice <notice>" + Clr.GRAY + " Set your team's notice");
+						ps(sender, perm+"set.self.title", label,	"set title <title>" + Clr.GRAY + " Set your team's title");
+						ps(sender, perm+"set.self.locked", label,	"set locked [on|off]" + Clr.GRAY + " Toggle if players can join without invites");
+						ps(sender, perm+"set.self.invites", label,	"set invites [on|off]" + Clr.GRAY + " Toggle if members can invite or not");
 					}
 				}
 			}
 			return true;
 		}
-		/*if (args.length == 1) {
-			if (player.hasPermission("teams.admin")) {
-				if (MiscUtils.eq(args[0], "create")) {
-					player.sendMessage(ChatColor.RED + "/teams create [TeamName]");
-				}
-				if (MiscUtils.eq(args[0], "spy")) {
-					CarbonTeams.toggleSpying(player);
-					player.sendMessage(ChatColor.YELLOW + (CarbonTeams.isSpying(player)?"You are now spying on team/ally chat":"Spy Chat mode off."));
-				}
-				return true;
-			}
-			if (MiscUtils.eq(args[0], "chat")) {
-				if (Team.hasTeam(player)) {
-					ChatType type = CarbonTeams.getChatMode(player);
-					switch (type) {
-						case ENEMY:
-							player.sendMessage(ChatColor.YELLOW + "Now talking in ALL chat.");
-							ChatListener.chatMode.put(player.getUniqueId(), ChatType.NORMAL);
-							break;
-						default:
-							player.sendMessage(ChatColor.YELLOW + "Now talking in Team Chat.");
-							ChatListener.chatMode.put(player.getUniqueId(), ChatType.TEAM);
-							break;
-					}
+		if (args.length > 0) {
+			if (MiscUtils.eq(args[0], "set")) {
+				if (args.length == 1) {
+					// TODO Print set help
 				} else {
-					player.sendMessage(ChatColor.RED + "You do not have a team to chat with!");
+					if (MiscUtils.eq(args[1], "home")) {
+
+					} else if (MiscUtils.eq(args[1], "banner")) {
+
+					} else if (MiscUtils.eq(args[1], "prefix")) {
+
+					} else if (MiscUtils.eq(args[1], "postfix")) {
+
+					} else if (MiscUtils.eq(args[1], "greeting")) {
+
+					} else if (MiscUtils.eq(args[1], "notice")) {
+
+					} else if (MiscUtils.eq(args[1], "title")) {
+
+					} else if (MiscUtils.eq(args[1], "locked")) {
+
+					} else if (MiscUtils.eq(args[1], "invites")) {
+
+					}
 				}
-				return true;
-			}
-			if (MiscUtils.eq(args[0], "home")) {
-				if (Team.hasTeam(player)) {
-					Team t = Team.getTeam(player);
-					player.teleport(t.getHome());
-					player.sendMessage(ChatColor.LIGHT_PURPLE + "Teleporting to cubeteams home...");
-					return true;
-				}
-				player.sendMessage(ChatColor.RED + "You are not a part of any team to go home to!");
-				return true;
+			} else if (MiscUtils.eq(args[0], "create")) {
+
+			} else if (MiscUtils.eq(args[0], "delete")) {
+
+			} else if (MiscUtils.eq(args[0], "add")) {
+
+			} else if (MiscUtils.eq(args[0], "remove")) {
+
+			} else if (MiscUtils.eq(args[0], "invite")) {
+
+			} else if (MiscUtils.eq(args[0], "kick")) {
+
+			} else if (MiscUtils.eq(args[0], "home")) {
+
+			} else if (MiscUtils.eq(args[0], "spy")) {
+
+			} else if (MiscUtils.eq(args[0], "chat")) {
+
 			}
 		}
-		if (!player.hasPermission("teams.admin")) { return true; }
-		if (args.length == 2) {
-			if (MiscUtils.eq(args[0], "create")) {
-				if (Team.getTeam(args[1]) != null) {
-					player.sendMessage(ChatColor.RED + "Team already exists: " + args[1]);
-					return true;
-				}
-				new Team(args[1]);
-				player.sendMessage(ChatColor.GRAY + "You have created the team: " + ChatColor.AQUA + args[1]);
-				return true;
-			}
-			if (MiscUtils.eq(args[0], "sethome")) {
-				if (Team.getTeam(args[1]) != null) {
-					Team t = Team.getTeam(args[1]);
-					t.setHome(player.getLocation());
-					player.sendMessage(ChatColor.GREEN + "You have set home for the team: " + t.getName());
-				} else {
-					player.sendMessage(ChatColor.RED + "Team does not exist: " + args[1]);
-				}
-				return true;
-			}
-		}
-		if (args.length > 2) {
-			if (MiscUtils.eq(args[0], "create")) {
-				if (Team.getTeam(args[1]) != null) {
-					player.sendMessage(ChatColor.RED + "Team already exists: " + args[1]);
-					return true;
-				}
-				Team t = new Team(args[1]);
-				for (int i = 2; i < args.length; i++) { // TODO Convert for loop to echo comma list of usernames
-					if (Bukkit.getPlayer(args[i]) == null) {
-						player.sendMessage(ChatColor.RED + "Could not add " + args[i] + " to the team, is he offline?");
-					} else {
-						Player p = Bukkit.getPlayer(args[i]);
-						t.addMember(p);
-						player.sendMessage(ChatColor.GREEN + p.getName() + " has successfully been assigned to the team " + t.getName());
-					}
-				}
-				player.sendMessage(ChatColor.GRAY + "You have created the team: " + ChatColor.AQUA + args[1]);
-				return true;
-			}
-			if (MiscUtils.eq(args[0], "add")) {
-				if (Team.getTeam(args[1]) != null) {
-					Team t = Team.getTeam(args[1]);
-					for (int i = 2; i < args.length; i++) { // TODO Convert for loop to echo comma list of usernames
-						if (Bukkit.getPlayer(args[i]) == null) {
-							player.sendMessage(ChatColor.RED + "Could not add " + args[i] + " to the team, is he offline?");
-						} else {
-							Player p = Bukkit.getPlayer(args[i]);
-							t.addMember(p);
-							player.sendMessage(ChatColor.GREEN + p.getName() + " has successfully been assigned to the team " + t.getName());
-						}
-					}
-				} else {
-					player.sendMessage(ChatColor.RED + "Team does not exist: " + args[1]);
-					return true;
-				}
-			}
-			if (MiscUtils.eq(args[0], "remove")) {
-				if (Team.getTeam(args[1]) != null) {
-					Team t = Team.getTeam(args[1]);
-					for (int i = 2; i < args.length; i++) {
-						boolean on = false;
-						if (Bukkit.getPlayer(args[i]) != null) { on = true; }
-						if (on) {
-							if (t.isMember(Bukkit.getPlayer(args[i]))) {
-								t.removeMember(Bukkit.getPlayer(args[i]));
-								player.sendMessage(ChatColor.GREEN + "Removed " + args[i] + " from the team");
-							}
-						} else if (t.isMember(Bukkit.getOfflinePlayer(args[i]))) {
-							t.removeMember(Bukkit.getOfflinePlayer(args[i]));
-							player.sendMessage(ChatColor.GREEN + "Removed " + args[i] + " from the team");
-						}
-					}
-					return true;
-				} else {
-					player.sendMessage(ChatColor.RED + "Team does not exist: " + args[1]);
-					return true;
-				}
-			}
-		}*/
 		return true;
 	}
 
 	// Shorthand method, just to shorten line lengths since I use it a lot above.
 	private void ps(CommandSender s, String p, String m) { MiscUtils.permSend(s, p, m); }
+
+	// Idental to the above method but auto prepends the command label
+	private void ps(CommandSender s, String p, String l, String m) { MiscUtils.permSend(s, p, Clr.LIME+"/"+l+" "+m); }
 }
