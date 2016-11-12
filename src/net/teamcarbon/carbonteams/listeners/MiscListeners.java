@@ -1,7 +1,7 @@
 package net.teamcarbon.carbonteams.listeners;
 
-import net.teamcarbon.carbonlib.LocUtils;
-import net.teamcarbon.carbonlib.MiscUtils;
+import net.teamcarbon.carbonlib.Misc.LocUtils;
+import net.teamcarbon.carbonlib.Misc.MiscUtils;
 import net.teamcarbon.carbonteams.CarbonTeams;
 import net.teamcarbon.carbonteams.utils.CustomMessages.CustomMessage;
 import net.teamcarbon.carbonteams.utils.Team;
@@ -30,7 +30,7 @@ public class MiscListeners implements Listener {
 			Team t = Team.getTeam(p);
 			// This check also makes sure exp share is enabled in config and checks if per-team toggles are enabled
 			if (t.isExpShareEnabled()) {
-				List<Player> sharedWith = new ArrayList<Player>();
+				List<Player> sharedWith = new ArrayList<>();
 				double maxDist = conf.getDouble("share-radius", 50);
 				boolean ignoreRadius = false;
 				// If the max distance is impossible (negative), disable radius and share with all members or allies if enabled
@@ -58,7 +58,7 @@ public class MiscListeners implements Listener {
 					// TODO Call a custom exp share event so that this event can be modified later
 					// TODO Allows the collector's exp and shared exp to be modified or cancel the event
 					e.setAmount(collectorShare);
-					HashMap<String, String> rep = new HashMap<String, String>();
+					HashMap<String, String> rep = new HashMap<>();
 					rep.put("{COLLECTED}", collectorShare+"");
 					rep.put("{COLLECTOR}", p.getName());
 					rep.put("{SHARED}", share+"");

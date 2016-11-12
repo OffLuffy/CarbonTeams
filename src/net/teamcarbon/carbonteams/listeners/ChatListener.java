@@ -1,7 +1,7 @@
 package net.teamcarbon.carbonteams.listeners;
 
 
-import net.teamcarbon.carbonlib.MiscUtils;
+import net.teamcarbon.carbonlib.Misc.MiscUtils;
 import net.teamcarbon.carbonteams.CarbonTeams;
 import net.teamcarbon.carbonteams.CarbonTeams.ChatType;
 import net.teamcarbon.carbonteams.utils.CustomMessages.CustomMessage;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 public class ChatListener implements Listener {
 	
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void onChat(AsyncPlayerChatEvent e) {
 		Player p = e.getPlayer();
 		ChatType ct = CarbonTeams.getChatMode(p);
@@ -32,7 +32,7 @@ public class ChatListener implements Listener {
 				p.sendMessage(CustomMessage.NO_CHAT_TEAM.pre());
 			} else {
 				if (msgParts.length > 1) { // Send just this message to team chat, stay in previous mode
-					Team.getTeam(p).sendTeamMessage(p, MiscUtils.stringFromArray(msgParts, " ", 1));
+					Team.getTeam(p).sendTeamMessage(p, MiscUtils.stringFromSubArray(" ", 1, msgParts.length-1, msgParts));
 				} else { // Switch to team chat mode
 					if (ct == ChatType.TEAM) {
 						p.sendMessage(CustomMessage.TEAM_CHAT_ALREADY.pre());
@@ -53,7 +53,7 @@ public class ChatListener implements Listener {
 				p.sendMessage(CustomMessage.NO_CHAT_TEAM.pre());
 			} else {
 				if (msgParts.length > 1) { // Send just this message to ally chat, stay in previous mode
-					Team.getTeam(p).sendAllyMessage(p, MiscUtils.stringFromArray(msgParts, " ", 1));
+					Team.getTeam(p).sendAllyMessage(p, MiscUtils.stringFromSubArray(" ", 1, msgParts.length-1, msgParts));
 				} else { // Switch to ally chat mode
 					if (ct == ChatType.ALLY) {
 						p.sendMessage(CustomMessage.ALLY_CHAT_ALREADY.pre());
@@ -68,7 +68,7 @@ public class ChatListener implements Listener {
 			// No permission check since it's public chat, not handled by this plugin
 			if (msgParts.length > 1) { // Send just this message to normal chat, stay in previous mode
 				// Lets remove the hashtag prefix from the message, then let the event execute normally
-				e.setMessage(MiscUtils.stringFromArray(msgParts, " ", 1));
+				e.setMessage(MiscUtils.stringFromSubArray(" ", 1, msgParts.length-1, msgParts));
 			} else { // Switch to normal chat mode
 				e.setCancelled(true);
 				if (ct == ChatType.NORMAL) {

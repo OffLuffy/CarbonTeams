@@ -1,7 +1,7 @@
 package net.teamcarbon.carbonteams.commands;
 
-import net.teamcarbon.carbonlib.Messages.Clr;
-import net.teamcarbon.carbonlib.MiscUtils;
+import net.teamcarbon.carbonlib.Misc.Messages.Clr;
+import net.teamcarbon.carbonlib.Misc.MiscUtils;
 import net.teamcarbon.carbonteams.CarbonTeams;
 import net.teamcarbon.carbonteams.utils.CustomMessages.CustomMessage;
 import net.teamcarbon.carbonteams.utils.Team;

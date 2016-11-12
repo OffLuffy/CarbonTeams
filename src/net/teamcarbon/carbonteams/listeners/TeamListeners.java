@@ -1,6 +1,6 @@
 package net.teamcarbon.carbonteams.listeners;
 
-import net.teamcarbon.carbonlib.Log;
+import net.teamcarbon.carbonteams.CarbonTeams;
 import net.teamcarbon.carbonteams.events.*;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
@@ -12,30 +12,30 @@ import org.bukkit.event.Listener;
 
 @SuppressWarnings("UnusedDeclaration")
 public class TeamListeners implements Listener {
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamCreate(TeamCreateEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamDelete(TeamDeleteEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamJoin(TeamJoinEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamLeave(TeamLeaveEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamSetHome(TeamSetHomeEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamSetBanner(TeamSetBannerEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamGoHome(TeamTeleportHomeEvent e) { debugHandle(e); }
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler()
 	public void teamGetBanner(TeamGetBannerEvent e) { debugHandle(e); }
 
 	// Simple method to print out event information as they're called into as a debug log
-	private void debugHandle(Cancellable e) { Log.debug(e.getClass().getName() + " - Cancelled: " + e.isCancelled()); }
+	private void debugHandle(Cancellable e) { CarbonTeams.log.debug(e.getClass().getName() + " - Cancelled: " + e.isCancelled()); }
 }

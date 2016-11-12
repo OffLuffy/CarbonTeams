@@ -5,7 +5,8 @@ import net.teamcarbon.carbonteams.CarbonTeams.ConfType;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import net.teamcarbon.carbonlib.Messages.Clr;
+
+import static net.teamcarbon.carbonlib.Misc.Messages.Clr;
 
 /**
  * Convenience class. This allows me to fetch messages easily, as well as store them and provide default messages
@@ -13,7 +14,7 @@ import net.teamcarbon.carbonlib.Messages.Clr;
 @SuppressWarnings("UnusedDeclaration")
 public class CustomMessages {
 	private static boolean init = false;
-	public static enum CustomMessage {
+	public enum CustomMessage {
 		// Generic messages
 		PREFIX("prefix", "&6&l[" + CarbonTeams.inst.getDescription().getName() + "] &r"),
 		RELOADED("reloaded", "&bReloaded"),

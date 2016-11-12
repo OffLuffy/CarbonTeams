@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import net.teamcarbon.carbonlib.LocUtils;
-import net.teamcarbon.carbonlib.Log;
-import net.teamcarbon.carbonlib.MiscUtils;
+import net.teamcarbon.carbonlib.Misc.LocUtils;
+import net.teamcarbon.carbonlib.Misc.MiscUtils;
 import net.teamcarbon.carbonteams.CarbonTeams.ConfType;
 import net.teamcarbon.carbonteams.CarbonTeams;
 import net.teamcarbon.carbonteams.utils.CustomMessages.CustomMessage;
@@ -19,6 +18,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import static net.teamcarbon.carbonlib.Misc.Messages.Clr.trans;
 
 @SuppressWarnings("UnusedDeclaration")
 public class Team {
@@ -110,7 +111,7 @@ public class Team {
 	 * Fetches a copy of the cached members list. To refresh this list, call loadMembers()
 	 * @return Returns a List&gt;UUID&lt; of members in this Team
 	 */
-	public List<OfflinePlayer> getMembers() { return new ArrayList<OfflinePlayer>(members); }
+	public List<OfflinePlayer> getMembers() { return new ArrayList<>(members); }
 
 	/**
 	 * Indicates whether the specified Team is an ally of the current Team
@@ -137,14 +138,14 @@ public class Team {
 	 * Fetches a list of friendly Team names
 	 * @return The String List of Team names listed as allies
 	 */
-	public List<Team> getAllies() { return new ArrayList<Team>(allies); }
+	public List<Team> getAllies() { return new ArrayList<>(allies); }
 
 	/**
 	 * Fetches a list of all members in all ally Teams
 	 * @return Returns a List of OfflinePlayers whom belong to allied Teams
 	 */
 	public List<OfflinePlayer> getAllyMembers() {
-		List<OfflinePlayer> allyMembers = new ArrayList<OfflinePlayer>();
+		List<OfflinePlayer> allyMembers = new ArrayList<>();
 		for (Team t : allies) allyMembers.addAll(t.getMembers());
 		return allyMembers;
 	}
@@ -254,14 +255,14 @@ public class Team {
 				banner.setAmount(1);
 				ItemMeta bm = banner.getItemMeta();
 				String bannerName = trans(vars(sect.getString("banner-name"), null));
-				List<String> bannerLore = new ArrayList<String>();
+				List<String> bannerLore = new ArrayList<>();
 				for (String s : sect.getStringList("banner-lore"))
 					bannerLore.add(trans(vars(s, null)));
 				if (bannerName.length() > 0) bm.setDisplayName(bannerName);
 				if (bannerLore.size() > 0) bm.setLore(bannerLore);
 				return true;
-			} else { Log.warn("Banner specified for team: " + getName() + " in teams.yml isn't a banner!"); }
-		} else { Log.debug("The server doesn't seem to support banners yet! Skipping setting the team's banner"); }
+			} else { CarbonTeams.log.warn("Banner specified for team: " + getName() + " in teams.yml isn't a banner!"); }
+		} else { CarbonTeams.log.debug("The server doesn't seem to support banners yet! Skipping setting the team's banner"); }
 		return false;
 	}
 
@@ -270,7 +271,7 @@ public class Team {
 	 * hand, some values may fail to set if they don't adhere to the mutator limits
 	 */
 	public void loadTeamDataFromFile() {
-		Log.debug("Loading data for Team: " + getName());
+		CarbonTeams.log.debug("Loading data for Team: " + getName());
 		ConfigurationSection sect = CarbonTeams.getConfig(ConfType.TEAMS).getConfigurationSection(teamsPath);
 		setHome(LocUtils.fromStr(sect.getString(teamsPath + ".home")));
 		setPrefix(sect.getString(teamsPath + ".prefix"));
@@ -280,17 +281,17 @@ public class Team {
 		setBanner(sect.getItemStack(teamsPath + ".banner"));
 
 		// Load members
-		if (members == null) members = new ArrayList<OfflinePlayer>();
+		if (members == null) members = new ArrayList<>();
 		if (!members.isEmpty()) members.clear();
 		boolean needsSave = false;
 		FileConfiguration teams = CarbonTeams.getConfig(ConfType.TEAMS);
 		// Iterates over a copy of the list in case it needs to remove a UUID during iteration
 		// This will log a warning noting the invalid UUID then remove it to prevent spamming the warning
-		for (String s : new ArrayList<String>(teams.getStringList("teams." + getName() + ".members"))) {
+		for (String s : new ArrayList<>(teams.getStringList("teams." + getName() + ".members"))) {
 			try {
 				members.add(Bukkit.getOfflinePlayer(UUID.fromString(s)));
 			} catch (Exception e) {
-				Log.warn("Invalid UUID in teams.yml in members of team: " + getName() + ", removing it...");
+				CarbonTeams.log.warn("Invalid UUID in teams.yml in members of team: " + getName() + ", removing it...");
 				// Remove the invalid UUID from the actual stored data, not the copy we're iterating over
 				MiscUtils.removeFromStringList(teams, "teams." + getName() + ".members", s);
 				needsSave = true;
@@ -366,7 +367,7 @@ public class Team {
 		for (Player pl : Bukkit.getOnlinePlayers()) {
 			if (isMember(pl) || CarbonTeams.isSpying(pl)) {
 				// Prepare this list to store the message/sender to pass to variable parsing
-				HashMap<String, String> additional = new HashMap<String, String>();
+				HashMap<String, String> additional = new HashMap<>();
 				// permColorParse() only parses color codes if the specified user has permission to do so
 				additional.put("{MESSAGE}", MiscUtils.permColorParse(message, pl, "carbonteams.chat.teams"));
 				additional.put("{SENDER}", dispName?pl.getDisplayName():pl.getName());
@@ -383,23 +384,22 @@ public class Team {
 		String spyPatPath = "message-settings.spy-ally-pattner";
 		String defaultPat = "&7♥&8[&b{PREFIX}&8] &7{SENDER}:&3 {MESSAGE}";
 		String defSpyPat = "&8[&eTSpy&8]&7♥&8[&b{PREFIX}&8] &7{SENDER}:&7 {MESSAGE}";
+		String msgPat = trans(CarbonTeams.inst.getConfig().getString( msgPatPath, defaultPat));
+		String spyPat = trans(CarbonTeams.inst.getConfig().getString(spyPatPath, defSpyPat));
 		boolean dispName = CarbonTeams.inst.getConfig().getBoolean("message-settings.use-player-displayname", false);
 		for (Player pl : Bukkit.getOnlinePlayers()) {
 			if (((isMember(pl) || isAlly(pl)) && CarbonTeams.isListeningToAllies(pl)) || CarbonTeams.isSpying(pl)) {
-				HashMap<String, String> additional = new HashMap<String, String>();
-				additional.put("{MESSAGE}", MiscUtils.permColorParse(message, pl, "carbonteams.chat.allies"));
-				additional.put("{SENDER}", dispName?pl.getDisplayName():pl.getName());
+				HashMap<String, String> additional = new HashMap<>();
+				additional.put("{MESSAGE}", MiscUtils.permColorParse(message, p, "carbonteams.chat.allies"));
+				additional.put("{SENDER}", dispName?p.getDisplayName():p.getName());
 				// Send to members or allies whom are listening
 				if ((isMember(pl) || isAlly(pl)) && CarbonTeams.isListeningToAllies(pl))
-					pl.sendMessage(vars(trans(CarbonTeams.inst.getConfig().getString( msgPatPath, defaultPat)), additional));
+					pl.sendMessage(vars(msgPat, additional));
 				else // Otherwise only send to spies (already guaranteed if it gets here)
-					pl.sendMessage(vars(trans(CarbonTeams.inst.getConfig().getString(spyPatPath, defSpyPat)), additional));
+					pl.sendMessage(vars(spyPat, additional));
 			}
 		}
 	}
-
-	// Just a shorter way to parse color codes, Bukkit's is a bit lengthy
-	private String trans(String m) { return ChatColor.translateAlternateColorCodes('&', m); }
 
 	/**
 	 * Parses the variables: {TEAMNAME}, {PREFIX}, {POSTFIX}, {LEADER}, {GREETING}, and {NOTICE}
@@ -408,7 +408,7 @@ public class Team {
 	 * @return Returns the String with the parsed variables
 	 */
 	public String vars(String s, HashMap<String, String> additional) {
-		HashMap<String, String> replace = new HashMap<String, String>();
+		HashMap<String, String> replace = new HashMap<>();
 		replace.put("{TEAMNAME}", getName());
 		replace.put("{PREFIX}", getPrefix());
 		replace.put("{POSTFIX}", getPostfix());

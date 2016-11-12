@@ -1,30 +1,22 @@
 package net.teamcarbon.carbonteams;
 
-import net.milkbowl.vault.chat.Chat;
+import net.teamcarbon.carbonlib.CarbonPlugin;
 import net.teamcarbon.carbonteams.commands.TeamsCommand;
 import net.teamcarbon.carbonteams.listeners.ChatListener;
 import net.teamcarbon.carbonteams.listeners.MiscListeners;
 import net.teamcarbon.carbonteams.listeners.TeamListeners;
-import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.permission.Permission;
-import net.teamcarbon.carbonlib.ConfigAccessor;
-import net.teamcarbon.carbonlib.Log;
-import net.teamcarbon.carbonlib.MiscUtils;
+import net.teamcarbon.carbonlib.Misc.ConfigAccessor;
 import net.teamcarbon.carbonteams.utils.Team;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @SuppressWarnings("UnusedDeclaration")
-public class CarbonTeams extends JavaPlugin {
+public class CarbonTeams extends CarbonPlugin {
 
 	/**
 	 * Config types, used to easily access, save, and reload non-default configs
@@ -55,17 +47,17 @@ public class CarbonTeams extends JavaPlugin {
 		 * Returns the config object stored in this ConfType
 		 * @return Returns a FileConfiguration object associated with this config type
 		 */
-		public FileConfiguration getConfig() { return ca.getConfig(); }
+		public FileConfiguration getConfig() { return ca.config(); }
 
 		/**
 		 * Saves the FileConfiguration associated with this config type to the stored file path
 		 */
-		public void saveConfig() { ca.saveConfig(); }
+		public void saveConfig() { ca.save(); }
 
 		/**
 		 * Reloads the FileConfiguration associated with this config type from the stored file path
 		 */
-		public void reloadConfig() { ca.reloadConfig(); }
+		public void reloadConfig() { ca.reload(); }
 	}
 
 	/**
@@ -86,51 +78,24 @@ public class CarbonTeams extends JavaPlugin {
 		ALLY
 	}
 
-	// inst variable can be used to get a reference to the main plugin class via
-	// 'CarbonTeams.inst' from anywhere without passing the class into methods
-	public static CarbonTeams inst;
-	public static PluginManager pm;
-
 	// I'll use this to make sure banners exist. Some methods refer to this
 	// boolean later before executing to make sure it doesn't throw errors
 	public static boolean bannersEnabled = Material.getMaterial("BANNER") != null;
 
-	// Variables to hold Vault's service accessors
-	public static Permission perms;
-	public static Economy econ;
-	public static Chat chat;
-
 	// Some variables for holding other data used elsewhere
-	private static HashMap<Player, ChatType> chatMode = new HashMap<Player, ChatType>();
-	private static List<Player> spies = new ArrayList<Player>();
-	private static List<Player> listeningAllies = new ArrayList<Player>();
+	private static HashMap<Player, ChatType> chatMode = new HashMap<>();
+	private static List<Player> spies = new ArrayList<>();
+	private static List<Player> listeningAllies = new ArrayList<>();
 	
-	public void onEnable() {
-		inst = this;
-		pm = Bukkit.getPluginManager();
-
-		// Init the default config
-		saveDefaultConfig();
-		reloadConfig();
+	public void enablePlugin() {
 
 		// Inits all the non-default configs
 		for (ConfType ct : ConfType.values()) ct.initConfType();
 
-		// Setup the custom log. Specify the debug logging path in config.yml
-		new Log(this, "core.enable-debug-logging");
-
-		// Setup all Vault hooks or disable the plugin if any fail
-		if (!setupChat() || !setupPermissions() || !setupEconomy()) {
-			Log.severe("Couldn't find Vault! Disabling " + getDescription().getName());
-			pm.disablePlugin(this);
-			return;
-		}
-		Log.debug("Hooked to Vault for permission and economy support");
-
 		// Registers the chat listener event
-		pm.registerEvents(new ChatListener(), this);
-		pm.registerEvents(new TeamListeners(), this);
-		pm.registerEvents(new MiscListeners(), this);
+		pm().registerEvents(new ChatListener(), this);
+		pm().registerEvents(new TeamListeners(), this);
+		pm().registerEvents(new MiscListeners(), this);
 
 		// Registers commands
 		getServer().getPluginCommand("teams").setExecutor(new TeamsCommand());
@@ -238,43 +203,4 @@ public class CarbonTeams extends JavaPlugin {
 	 * @return Returns true if the Player is listening to their ally chat, false otherwise
 	 */
 	public static boolean isListeningToAllies(Player p) { return listeningAllies.contains(p); }
-
-	/**
-	 * @return Returns Vault's Chat object
-	 */
-	public static Chat chat() { return chat; }
-
-	/**
-	 * @return Returns Vault's Permission object
-	 */
-	public static Permission perm() { return perms; }
-
-	/**
-	 * @return Returns Vault's Economy object
-	 */
-	public static Economy econ() { return econ; }
-
-	// Hook into Vault's chat service, store as global static variable
-	private boolean setupChat() {
-		RegisteredServiceProvider<Chat> cp = Bukkit.getServicesManager().getRegistration(Chat.class);
-		if (cp != null) chat = cp.getProvider();
-		return chat != null;
-	}
-
-	// Hook into Vault's permission service, store in MiscUtils and as global static variable
-	private boolean setupPermissions() {
-		RegisteredServiceProvider<Permission> pp = Bukkit.getServicesManager().getRegistration(Permission.class);
-		if (pp != null)
-			perms = pp.getProvider();
-		MiscUtils.setPerms(perms); // MiscUtils has a perm check. Store a perm object in here for checking later
-		return perms != null;
-	}
-
-	// Hook into Vault's economy service, store as global static variable
-	private boolean setupEconomy() {
-		RegisteredServiceProvider<Economy> ep = getServer().getServicesManager().getRegistration(Economy.class);
-		if (ep != null)
-			econ = ep.getProvider();
-		return econ != null;
-	}
 }
